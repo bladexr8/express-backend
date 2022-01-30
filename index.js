@@ -14,23 +14,11 @@ let getEmailsRoute = (req, res) => {
     res.send(emails);
 }
 
-let noRouteFound = (req, res) => {
-    let route = req.method + ' ' + req.url;
-    res.end('You asked for ' + route);
-}
+let router = express.Router();
 
-let routes = {
-    'GET /users': getUsersRoute,
-    'GET /emails': getEmailsRoute,
-};
+router.get('/users', getUsersRoute);
+router.get('/emails', getEmailsRoute);
 
 
-app.use((req, res) => {
-    let route = req.method + ' ' + req.url;
-    let handler = routes[route] || noRouteFound;
-
-    handler(req, res);
-    
-});
-
+app.use(router);
 app.listen(3000);
