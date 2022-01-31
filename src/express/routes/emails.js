@@ -1,5 +1,5 @@
 const express = require('express');
-const jsonBodyParser = require('../../lib/json-body-parser');
+const bodyParser = require('body-parser');
 const generateId = require('../../lib/generate-id');
 const emails = require('../fixtures/emails');
 
@@ -57,6 +57,9 @@ let deleteEmailRoute = (req, res) => {
         "message": "Email Deleted",
     })
 }
+
+// re-use configured middlware
+let jsonBodyParser = bodyParser.json({ limit: '100kb'});
 
 let emailsRouter = express.Router();
 emailsRouter.get('/', getEmailsRoute);

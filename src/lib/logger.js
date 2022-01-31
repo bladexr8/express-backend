@@ -1,8 +1,6 @@
 // middleware logger
+const morgan = require('morgan');
 
-let logger = (req, res, next) => {
-    console.log(`${req.method} ${req.url}`);
-    next();
-}
+let logger = morgan('tiny');
 
 module.exports = logger;
