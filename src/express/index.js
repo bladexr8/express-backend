@@ -1,5 +1,6 @@
 const express = require('express');
 const logger = require('../lib/logger');
+const lastResortErrorHandler = require('../lib/last-resort-error-handler');
 
 const usersRouter = require('./routes/users');
 const emailsRouter = require('./routes/emails');
@@ -8,6 +9,7 @@ let app = express();
 
 // middleware
 app.use(logger);
+app.use(lastResortErrorHandler);
 
 // routers
 app.use('/emails', emailsRouter);
