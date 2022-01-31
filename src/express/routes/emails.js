@@ -1,6 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const generateId = require('../../lib/generate-id');
+const requireAuth = require('../../lib/require-auth');
 const path = require('path');
 const multer = require('multer');
 const emails = require('../fixtures/emails');
@@ -69,6 +70,10 @@ let deleteEmailRoute = (req, res) => {
 let jsonBodyParser = bodyParser.json({ limit: '100kb'});
 
 let emailsRouter = express.Router();
+
+// require all requests to the router be authenticated
+emailsRouter.use(requireAuth);
+
 emailsRouter.get('/', getEmailsRoute);
 emailsRouter.get('/:id', getEmailRoute);
 emailsRouter.post('/', jsonBodyParser, upload.array('attachments'), createEmailRoute);
