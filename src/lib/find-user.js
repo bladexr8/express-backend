@@ -6,3 +6,9 @@ let findUserByCredentials = ({ username, password }) => {
 }
 
 exports.byCredentials = findUserByCredentials;
+
+let findUserByToken = ({ userId }) => {
+    return users.find(user => user.id === userId);
+}
+
+exports.byToken = findUserByToken;
