@@ -48,7 +48,7 @@ let createEmailRoute = async (req, res) => {
 
 let updateEmailRoute = async (req, res) => {
     let email = emails.find(email => email.id === req.params.id);
-    
+    req.authorize(email);
     Object.assign(email, req.body);
     res.status(200);
     res.send({
@@ -60,14 +60,14 @@ let updateEmailRoute = async (req, res) => {
 }
 
 // authorization policy
-let updateEmailPolicy = (req) => {
-    let email = emails.find(email => email.id === req.params.id);
-    let user = req.user;
+let updateEmailPolicy = (user, email) => {
     return user.id === email.from;
 }
 
 
 let deleteEmailRoute = (req, res) => {
+    let email = emails.find(email => email.id === req.params.id);
+    req.authorize(email);
     let index = emails.findIndex(email => email.id === req.params.id);
     emails.splice(index, 1);
     res.status(204);
@@ -78,9 +78,7 @@ let deleteEmailRoute = (req, res) => {
 }
 
 // authorization policy
-let deleteEmailPolicy = (req) => {
-    let email = emails.find(email => email.id === req.params.id);
-    let user = req.user;
+let deleteEmailPolicy = (user, email) => {
     return user.id === email.to;
 }
 
