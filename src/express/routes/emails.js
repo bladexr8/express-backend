@@ -2,6 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const generateId = require('../../lib/generate-id');
 const requireAuth = require('../../lib/require-auth');
+const enforce = require('../../lib/enforce');
 const path = require('path');
 const multer = require('multer');
 const emails = require('../fixtures/emails');
@@ -58,15 +59,13 @@ let updateEmailRoute = async (req, res) => {
        
 }
 
-let authorizeUpdateEmailRoute = (req, res, next) => {
+// authorization policy
+let updateEmailPolicy = (req) => {
     let email = emails.find(email => email.id === req.params.id);
     let user = req.user;
-    if (user.id === email.from) {
-        next();
-    } else {
-        res.sendStatus(403);
-    }
+    return user.id === email.from;
 }
+
 
 let deleteEmailRoute = (req, res) => {
     let index = emails.findIndex(email => email.id === req.params.id);
@@ -78,15 +77,13 @@ let deleteEmailRoute = (req, res) => {
     })
 }
 
-let authorizeDeleteEmailRoute = (req, res, next) => {
+// authorization policy
+let deleteEmailPolicy = (req) => {
     let email = emails.find(email => email.id === req.params.id);
     let user = req.user;
-    if (user.id === email.from) {
-        next();
-    } else {
-        res.sendStatus(403);
-    }
+    return user.id === email.to;
 }
+
 
 // re-use configured middlware
 let jsonBodyParser = bodyParser.json({ limit: '100kb'});
@@ -99,7 +96,7 @@ emailsRouter.use(requireAuth);
 emailsRouter.get('/', getEmailsRoute);
 emailsRouter.get('/:id', getEmailRoute);
 emailsRouter.post('/', jsonBodyParser, upload.array('attachments'), createEmailRoute);
-emailsRouter.patch('/:id', authorizeUpdateEmailRoute, jsonBodyParser, updateEmailRoute);
-emailsRouter.delete('/:id', authorizeDeleteEmailRoute, deleteEmailRoute);
+emailsRouter.patch('/:id', enforce(updateEmailPolicy), jsonBodyParser, updateEmailRoute);
+emailsRouter.delete('/:id', enforce(deleteEmailPolicy), deleteEmailRoute);
 
 module.exports = emailsRouter;
