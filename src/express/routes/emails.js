@@ -47,6 +47,7 @@ let createEmailRoute = async (req, res) => {
 
 let updateEmailRoute = async (req, res) => {
     let email = emails.find(email => email.id === req.params.id);
+    
     Object.assign(email, req.body);
     res.status(200);
     res.send({
@@ -54,6 +55,17 @@ let updateEmailRoute = async (req, res) => {
         "message": "Email Updated",
         "notes": email
     })
+       
+}
+
+let authorizeUpdateEmailRoute = (req, res, next) => {
+    let email = emails.find(email => email.id === req.params.id);
+    let user = req.user;
+    if (user.id === email.from) {
+        next();
+    } else {
+        res.sendStatus(403);
+    }
 }
 
 let deleteEmailRoute = (req, res) => {
@@ -64,6 +76,16 @@ let deleteEmailRoute = (req, res) => {
         "status": "OK",
         "message": "Email Deleted",
     })
+}
+
+let authorizeDeleteEmailRoute = (req, res, next) => {
+    let email = emails.find(email => email.id === req.params.id);
+    let user = req.user;
+    if (user.id === email.from) {
+        next();
+    } else {
+        res.sendStatus(403);
+    }
 }
 
 // re-use configured middlware
@@ -77,7 +99,7 @@ emailsRouter.use(requireAuth);
 emailsRouter.get('/', getEmailsRoute);
 emailsRouter.get('/:id', getEmailRoute);
 emailsRouter.post('/', jsonBodyParser, upload.array('attachments'), createEmailRoute);
-emailsRouter.patch('/:id', jsonBodyParser, updateEmailRoute);
-emailsRouter.delete('/:id', deleteEmailRoute);
+emailsRouter.patch('/:id', authorizeUpdateEmailRoute, jsonBodyParser, updateEmailRoute);
+emailsRouter.delete('/:id', authorizeDeleteEmailRoute, deleteEmailRoute);
 
 module.exports = emailsRouter;
